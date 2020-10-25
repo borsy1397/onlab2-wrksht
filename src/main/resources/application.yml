@@ -1,0 +1,86 @@
+wrksht:
+  web:
+    schema: http://
+    host: localhost:8080
+
+  admin:
+    username: admin
+    password: admin
+
+  security:
+    token:
+      secret: wrkshttokensecret
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: wrksht
+  main:
+    allow-bean-definition-overriding: true
+
+  jackson:
+    serialization:
+      indent_output: true
+      write_dates_as_timestamps: false
+    visibility:
+      field: any
+      getter: none
+      setter: none
+      is-getter: none
+
+  datasource:
+    username: postgres
+    password: password
+    url: jdbc:postgresql://localhost:15432/wrksht
+    driver-class-name: org.postgresql.Driver
+    initialization-mode: always
+    platform: wrksht
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    hibernate:
+      ddl-auto: update
+      use-new-id-generator-mappings: true
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    properties:
+      hibernate:
+        default_schema: wrksht
+        generate_statistics: false
+        jdbc:
+          time_zone: UTC
+          lob:
+            non_contextual_creation: true
+        connection:
+          characterEncoding: utf-8
+          CharSet: utf-8
+          useUnicode: true
+        open-in-view: false
+    generate-ddl: true
+logging:
+  level:
+    root: info
+    org:
+      hibernate:
+        tool:
+          schema: error
+      apache:
+        coyote:
+          http11:
+            Http11InputBuffer: info
+      springframework:
+        web:
+          servlet:
+            DispatcherServlet: debug
+        security: info
+        data: info
+        cache: info
+        cloud:
+          sleuth:
+            instrument:
+              web:
+                ExceptionLoggingFilter: off
+
