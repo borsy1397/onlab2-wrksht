@@ -17,7 +17,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <openapi-generator-maven-plugin.version>4.1.2</openapi-generator-maven-plugin.version>
+        <openapi-generator-maven-plugin.version>4.2.3</openapi-generator-maven-plugin.version>
         <jsonwebtoken-version>0.9.1</jsonwebtoken-version>
     </properties>
 
@@ -120,6 +120,7 @@
                                 <configPackage>com.captainborsy.wrksht.api.internal.config</configPackage>
                                 <interfaceOnly>true</interfaceOnly>
                                 <serializableModel>true</serializableModel>
+                                <additionalModelTypeAnnotations>@lombok.Builder</additionalModelTypeAnnotations>
                             </configOptions>
                             <apiPackage>com.captainborsy.wrksht.api</apiPackage>
                             <modelPackage>com.captainborsy.wrksht.api.model</modelPackage>

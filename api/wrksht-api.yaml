@@ -336,6 +336,529 @@ paths:
         '500':
           description: Internal Server Error
       description: Make user admin by id
+  /api/worksheets:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - worksheet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorksheetDetailsDTO'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+      operationId: get-worksheets
+      description: Get all worksheets or filter them with status
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - TODO
+              - IN_PROGRESS
+              - DONE
+          in: query
+          name: status
+    post:
+      summary: ''
+      tags:
+        - worksheet
+      operationId: create-worksheet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorksheetDetailsDTO'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Create worksheet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorksheetCreationDTO'
+  '/api/worksheets/{worksheetId}':
+    parameters:
+      - schema:
+          type: string
+        name: worksheetId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags:
+        - worksheet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorksheetDetailsDTO'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-worksheet-by-id
+      description: Get worksheet by id
+    put:
+      summary: ''
+      tags:
+        - worksheet
+      operationId: update-worksheet-by-id
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Update worksheet by id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorksheetDTO'
+    delete:
+      summary: ''
+      tags:
+        - worksheet
+      operationId: delete-worksheet-by-id
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Delete worksheet (with flag)
+  '/api/worksheets/{worksheetId}/workflows':
+    parameters:
+      - schema:
+          type: string
+        name: worksheetId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags:
+        - worksheet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkflowDetailsDTO'
+      operationId: get-workflows-by-worksheet-id
+      description: Get all workflow or filter them with status of worksheet
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - TODO
+              - IN_PROGRESS
+              - DONE
+          in: query
+          name: status
+    post:
+      summary: ''
+      tags:
+        - worksheet
+      operationId: create-workflows-for-worksheet-by-worksheet-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowDetailsDTO'
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Create workflows for worksheet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListWorkflowCreationDTO'
+  '/api/worksheets/{worksheetId}/workflows/{workflowId}':
+    parameters:
+      - schema:
+          type: string
+        name: worksheetId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: workflowId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags:
+        - worksheet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowDetailsDTO'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-workflow-by-id
+      description: Get workflow by id
+    put:
+      summary: ''
+      tags:
+        - worksheet
+      operationId: update-workflow-by-id
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Update-workflow-by-id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkflowDTO'
+  '/api/worksheets/{worksheetId}/workflows/{workflowId}/order':
+    parameters:
+      - schema:
+          type: string
+        name: worksheetId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: workflowId
+        in: path
+        required: true
+    put:
+      summary: ''
+      tags:
+        - worksheet
+      operationId: order-workflow-by-id
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Ordering workflow by id (move up or down)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderWorkflowDTO'
+  '/api/worksheets/{worksheetId}/workflows/{workflowId}/changestatus':
+    parameters:
+      - schema:
+          type: string
+        name: worksheetId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: workflowId
+        in: path
+        required: true
+    put:
+      summary: ''
+      tags:
+        - worksheet
+      operationId: change-workflow-status
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Start or stop workflow
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowStatusChangeDTO'
+  '/api/stations/{stationId}/forcelogout':
+    parameters:
+      - schema:
+          type: string
+        name: stationId
+        in: path
+        required: true
+    put:
+      summary: ''
+      tags:
+        - station
+      operationId: station-force-logout
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Force logout the station
+  /api/stations:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - station
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StationDetailsDTO'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-all-stations
+      description: Get all stations
+    post:
+      summary: ''
+      tags:
+        - station
+      operationId: create-station
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationDetailsDTO'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Create station
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StationCreationDTO'
+  '/api/stations/{stationId}':
+    parameters:
+      - schema:
+          type: string
+        name: stationId
+        in: path
+        required: true
+    get:
+      summary: Get station details by id
+      tags:
+        - station
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationDetailsDTO'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-station-by-id
+      description: ''
+    put:
+      summary: ''
+      tags:
+        - station
+      operationId: update-station-by-id
+      responses:
+        '200':
+          description: OK
+      description: Update station by id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StationCreationDTO'
+    delete:
+      summary: ''
+      tags:
+        - station
+      operationId: delete-station-by-id
+      responses:
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Delete station by id
+  '/api/stations/{stationId}/set':
+    parameters:
+      - schema:
+          type: string
+        name: stationId
+        in: path
+        required: true
+    put:
+      summary: ''
+      tags:
+        - station
+      operationId: set-station
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Set station to tablet
+  '/api/users/{id}/forcelogout':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    put:
+      summary: ''
+      tags:
+        - user
+      operationId: user-force-logout
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Force logout user
+  /api/users/me/logout:
+    put:
+      summary: ''
+      tags:
+        - user
+      operationId: user-logout
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: User logout
 components:
   schemas:
     PasswordChangeDTO:
@@ -381,6 +904,23 @@ components:
       properties:
         id:
           type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - WORKER
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     RefreshTokenDTO:
       title: RefreshTokenDTO
       type: object
@@ -395,7 +935,7 @@ components:
           type: string
         lastName:
           type: string
-        userName:
+        username:
           type: string
         password:
           type: string
@@ -410,16 +950,203 @@ components:
       required:
         - firstName
         - lastName
-        - userName
+        - username
         - password
         - role
     UserUpdateDTO:
       title: UserUpdateDTO
       type: object
       properties:
-        firstname:
+        firstName:
           type: string
         lastName:
           type: string
-        userName:
+        username:
+          type: string
+    WorksheetCreationDTO:
+      title: WorksheetCreationDTO
+      type: object
+      properties:
+        productName:
+          type: string
+        quantity:
+          type: integer
+        customer:
+          type: string
+        orderNumber:
+          type: string
+        deadline:
+          type: string
+          format: date-time
+        comment:
+          type: string
+        name:
+          type: string
+    WorkflowCreationDTO:
+      title: WorkflowCreationDTO
+      type: object
+      properties:
+        name:
+          type: string
+        shiftleadComment:
+          type: string
+        stationId:
+          type: string
+        workerId:
+          type: string
+        order:
+          type: integer
+    ListWorkflowCreationDTO:
+      title: ListWorkflowCreationDTO
+      type: object
+      properties:
+        workflows:
+          $ref: '#/components/schemas/WorkflowCreationDTO'
+    UpdateWorkflowDTO:
+      title: UpdateWorkflowDTO
+      type: object
+      properties:
+        name:
+          type: string
+        shiftLeadComment:
+          type: string
+        workerId:
+          type: string
+        stationId:
+          type: string
+    OrderWorkflowDTO:
+      title: OrderWorkflowDTO
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+            - UP
+            - DOWN
+      required:
+        - direction
+    WorkflowDetailsDTO:
+      title: WorkflowDetailsDTO
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        workerId:
+          type: string
+        stationId:
+          type: string
+        shiftLeadComment:
+          type: string
+        startedAt:
+          type: string
+        stoppedAt:
+          type: string
+        status:
+          type: string
+          enum:
+            - IN_PROGRESS
+            - DONE
+            - TODO
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        worksheetId:
+          type: string
+    UpdateWorksheetDTO:
+      title: UpdateWorksheetDTO
+      type: object
+      properties:
+        name:
+          type: string
+        productName:
+          type: string
+        quantity:
+          type: integer
+        customer:
+          type: string
+        orderNumber:
+          type: string
+        deadLine:
+          type: string
+          format: date-time
+        comment:
+          type: string
+    WorksheetDetailsDTO:
+      title: WorksheetDetailsDTO
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        productName:
+          type: string
+        quantity:
+          type: integer
+        customer:
+          type: string
+        orderNumber:
+          type: string
+        deadLine:
+          type: string
+          format: date-time
+        creatorId:
+          type: string
+        comment:
+          type: string
+        workflows:
+          type: array
+          items:
+            $ref: ''
+        status:
+          type: string
+          enum:
+            - TODO
+            - IN_PROGRESS
+            - DONE
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    StationCreationDTO:
+      title: StationCreationDTO
+      type: object
+      properties:
+        name:
+          type: string
+    WorkflowStatusChangeDTO:
+      title: WorkflowStatusChangeDTO
+      type: object
+      properties:
+        toStatus:
+          type: string
+          enum:
+            - START
+            - STOP
+      required:
+        - toStatus
+    StationDetailsDTO:
+      title: StationDetailsDTO
+      type: object
+      properties:
+        id:
+          type: string
+        set:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        name:
+          type: string
+        loggedInUserId:
           type: string

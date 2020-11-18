@@ -29,7 +29,7 @@ public class SecretServiceImpl implements SecretService {
     };
 
     @Autowired
-    public SecretServiceImpl(@Value("${transport.security.token.secret}") String secret) {
+    public SecretServiceImpl(@Value("${wrksht.security.token.secret}") String secret) {
         Map<String, String> secretMap = new HashMap<>();
         secretMap.put(SignatureAlgorithm.HS512.getValue(), secret);
         setSecrets(secretMap);

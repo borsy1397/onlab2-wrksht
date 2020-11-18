@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -25,16 +26,15 @@ import javax.persistence.Table;
 import java.time.Instant;
 import java.util.List;
 
-
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user")
+@Table(name = "station")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Station {
 
     @Id
     @Column(length = 36)
@@ -43,30 +43,20 @@ public class User {
     private String id;
 
     @Column(nullable = false)
-    private String firstName;
-    @Column(nullable = false)
-    private String lastName;
+    private String name;
 
-    @OneToMany(mappedBy = "worker", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "station", fetch = FetchType.LAZY)
     private List<Workflow> workflows;
 
-    @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
-    private List<Worksheet> createdWorksheets;
-
-    @Column(nullable = false)
-    private String username;
-    @Column(nullable = false)
-    private String password;
-
-    @OneToOne(mappedBy = "loggedInUser", fetch = FetchType.LAZY)
-    private Station loggedInStation;
+    @OneToOne( fetch = FetchType.LAZY)
+    private User loggedInUser;
 
     @ColumnDefault("false")
     private boolean isDeleted;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @ColumnDefault("false")
+    private boolean isSet;
+
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate

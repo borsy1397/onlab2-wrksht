@@ -19,22 +19,19 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.Instant;
-import java.util.List;
-
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user")
+@Table(name = "workflow")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Workflow {
 
     @Id
     @Column(length = 36)
@@ -43,32 +40,31 @@ public class User {
     private String id;
 
     @Column(nullable = false)
-    private String firstName;
-    @Column(nullable = false)
-    private String lastName;
+    private String name;
 
-    @OneToMany(mappedBy = "worker", fetch = FetchType.LAZY)
-    private List<Workflow> workflows;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Worksheet worksheet;
 
-    @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
-    private List<Worksheet> createdWorksheets;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User worker;
 
-    @Column(nullable = false)
-    private String username;
-    @Column(nullable = false)
-    private String password;
+    private Integer order;
 
-    @OneToOne(mappedBy = "loggedInUser", fetch = FetchType.LAZY)
-    private Station loggedInStation;
+    private String shiftLeadComment;
 
-    @ColumnDefault("false")
-    private boolean isDeleted;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station station;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Status status;
+
+    private Instant startedAt;
+    private Instant stoppedAt;
+
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate
     private Instant updatedAt;
 }
+

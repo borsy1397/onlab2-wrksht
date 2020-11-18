@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -19,22 +20,21 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.Instant;
 import java.util.List;
-
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user")
+@Table(name = "worksheet")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Worksheet {
 
     @Id
     @Column(length = 36)
@@ -43,30 +43,29 @@ public class User {
     private String id;
 
     @Column(nullable = false)
-    private String firstName;
-    @Column(nullable = false)
-    private String lastName;
+    private String name;
 
-    @OneToMany(mappedBy = "worker", fetch = FetchType.LAZY)
+    private String productName;
+    private Integer quantity;
+    private String customer;
+    private String orderNumber;
+    private Instant deadline;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User creator;
+
+    private String comment;
+
+    @OneToMany(mappedBy = "worksheet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Workflow> workflows;
-
-    @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
-    private List<Worksheet> createdWorksheets;
-
-    @Column(nullable = false)
-    private String username;
-    @Column(nullable = false)
-    private String password;
-
-    @OneToOne(mappedBy = "loggedInUser", fetch = FetchType.LAZY)
-    private Station loggedInStation;
 
     @ColumnDefault("false")
     private boolean isDeleted;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Status status;
+
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate
