@@ -1,74 +1,275 @@
 package com.captainborsy.wrksht.service.impl;
 
-import com.captainborsy.wrksht.api.model.ListWorkflowCreationDTO;
 import com.captainborsy.wrksht.api.model.OrderWorkflowDTO;
 import com.captainborsy.wrksht.api.model.UpdateWorkflowDTO;
 import com.captainborsy.wrksht.api.model.UpdateWorksheetDTO;
+import com.captainborsy.wrksht.api.model.WorkflowCreationDTO;
 import com.captainborsy.wrksht.api.model.WorkflowStatusChangeDTO;
 import com.captainborsy.wrksht.api.model.WorksheetCreationDTO;
+import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
+import com.captainborsy.wrksht.errorhandling.exception.EntityNotFoundException;
+import com.captainborsy.wrksht.errorhandling.exception.InvalidOperationException;
+import com.captainborsy.wrksht.errorhandling.exception.UnprocessableEntityException;
+import com.captainborsy.wrksht.errorhandling.exception.WorkflowStatusChangingException;
+import com.captainborsy.wrksht.mapper.WorkflowMapper;
+import com.captainborsy.wrksht.mapper.WorksheetMapper;
+import com.captainborsy.wrksht.model.Station;
+import com.captainborsy.wrksht.model.Status;
+import com.captainborsy.wrksht.model.User;
 import com.captainborsy.wrksht.model.Workflow;
 import com.captainborsy.wrksht.model.Worksheet;
+import com.captainborsy.wrksht.repository.WorkflowRepository;
+import com.captainborsy.wrksht.repository.WorksheetRepository;
+import com.captainborsy.wrksht.service.StationService;
+import com.captainborsy.wrksht.service.UserService;
 import com.captainborsy.wrksht.service.WorksheetService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class WorksheetServiceImpl implements WorksheetService {
+
+    private static final String WORKFLOW_NOT_FOUND = "Workflow not found";
+    private static final String WORKSHEET_NOT_FOUND = "Worksheet not found";
+
+    private final WorksheetRepository worksheetRepository;
+    private final WorkflowRepository workflowRepository;
+    private final UserService userService;
+    private final StationService stationService;
+
     @Override
+    @Transactional
     public void changeWorkflowStatus(String worksheetId, String workflowId, WorkflowStatusChangeDTO workflowStatusChangeDTO) {
+        Workflow workflow = getWorkflowById(worksheetId, workflowId);
 
+        if (workflow.getStatus() == Status.TODO && workflowStatusChangeDTO.getToStatus() == WorkflowStatusChangeDTO.ToStatusEnum.START) {
+            User user = userService.getCurrentUser();
+
+            workflow.setStartedAt(Instant.now());
+            workflow.setStatus(Status.IN_PROGRESS);
+            workflow.setWorker(user);
+            user.getWorkflows().add(workflow);
+
+            // TODO worksheetnek is beállítani?
+
+            workflowRepository.save(workflow);
+
+            return;
+        }
+
+        if (workflow.getStatus() == Status.IN_PROGRESS && workflowStatusChangeDTO.getToStatus() == WorkflowStatusChangeDTO.ToStatusEnum.STOP) {
+
+            workflow.setStoppedAt(Instant.now());
+            workflow.setStatus(Status.DONE);
+
+            // TODO csekkolni, hogy vége van-e már mindennek, mert akkor a worksheetnek is vége
+
+            return;
+        }
+
+        throw new WorkflowStatusChangingException("Workflow status (" + workflow.getStatus() + ") and change status (" + workflowStatusChangeDTO.getToStatus() + ") are not compatible", WrkshtErrors.STATUS_CHANGE_ERROR);
     }
 
     @Override
-    public Workflow createWorkflowToWorksheet(String worksheetId, ListWorkflowCreationDTO listWorkflowCreationDTO) {
-        return null;
+    @Transactional
+    public Workflow createWorkflowToWorksheet(String worksheetId, WorkflowCreationDTO workflowCreationDTO) {
+        Worksheet worksheet = getWorksheetById(worksheetId);
+        Station station = stationService.getStationById(workflowCreationDTO.getStationId());
+        Workflow workflow = WorkflowMapper.mapWorkflowCreationDTOtoWorkflow(workflowCreationDTO);
+
+        List<Workflow> workflows = worksheet.getWorkflows();
+        workflows.sort(Comparator.comparing(Workflow::getOrder));
+
+        workflow.setOrder(workflows.size() + 1);
+        workflow.setStation(station);
+        station.getWorkflows().add(workflow);
+
+        return workflowRepository.save(workflow);
     }
 
     @Override
+    @Transactional
     public Worksheet createWorksheet(WorksheetCreationDTO worksheetCreationDTO) {
-        return null;
+        Worksheet worksheet = WorksheetMapper.mapWorksheetCreationDTOtoWorksheet(worksheetCreationDTO);
+        User user = userService.getCurrentUser();
+
+        if (Instant.now().isAfter(worksheet.getDeadline())) {
+            throw new UnprocessableEntityException("Deadline is after actual time", WrkshtErrors.DEADLINE_ERROR);
+        }
+
+        worksheet.setStatus(Status.TODO);
+        worksheet.setCreator(user);
+        user.getCreatedWorksheets().add(worksheet);
+
+        return worksheetRepository.save(worksheet);
     }
 
     @Override
-    public void deleteById(String worksheetId) {
-
+    @Transactional
+    public void deleteWorksheetById(String worksheetId) {
+        Worksheet worksheet = getWorksheetById(worksheetId);
+        worksheet.setDeleted(true);
     }
 
     @Override
+    @Transactional
     public Workflow getWorkflowById(String worksheetId, String workflowId) {
-        return null;
+        return workflowRepository.findById(workflowId).orElseThrow(() -> new EntityNotFoundException(WORKFLOW_NOT_FOUND, WrkshtErrors.ENTITY_NOT_FOUND));
     }
 
     @Override
+    @Transactional
     public List<Workflow> getWorkflowsByWorksheetId(String worksheetId, String status) {
-        return null;
+
+        if (status == null) {
+            return workflowRepository.findByWorksheetId(worksheetId);
+        }
+
+        Status parsedStatus = parseStatus(status);
+
+        return workflowRepository.findByWorksheetIdAndStatus(worksheetId, parsedStatus);
     }
 
     @Override
+    @Transactional
     public Worksheet getWorksheetById(String worksheetId) {
-        return null;
+        return worksheetRepository.findById(worksheetId).orElseThrow(() -> new EntityNotFoundException(WORKSHEET_NOT_FOUND, WrkshtErrors.ENTITY_NOT_FOUND));
     }
 
     @Override
-    public Worksheet getWorksheets(String status) {
-        return null;
+    @Transactional
+    public List<Worksheet> getWorksheets(String status) {
+
+        if (status == null) {
+            return worksheetRepository.findByDeletedIs(false);
+        }
+
+        Status parsedStatus = parseStatus(status);
+
+        return worksheetRepository.findByStatusAndDeletedIs(parsedStatus, false);
+    }
+
+    private Status parseStatus(String status) {
+        Status parsedStatus;
+        try {
+            parsedStatus = Status.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            throw new UnprocessableEntityException("Parsing status (" + status + ") was failed", WrkshtErrors.PARSE_ERROR);
+        }
+        return parsedStatus;
     }
 
     @Override
+    @Transactional
     public void orderWorkflowById(String worksheetId, String workflowId, OrderWorkflowDTO orderWorkflowDTO) {
+        List<Workflow> workflows = workflowRepository.findByWorksheetId(worksheetId);
+        workflows.sort(Comparator.comparing(Workflow::getOrder));
+
+        for (int i = 0; i < workflows.size(); i++) {
+            Workflow actual = workflows.get(i);
+            int actualOrder = actual.getOrder();
+            if (actual.getId().equals(workflowId)) {
+                if (orderWorkflowDTO.getDirection() == OrderWorkflowDTO.DirectionEnum.DOWN) {
+                    if (actualOrder != 1) {
+                        actual.setOrder(actualOrder - 1);
+                        workflows.get(i - 1).setOrder(actualOrder);
+                    }
+                } else {
+                    if (actualOrder != workflows.size()) {
+                        actual.setOrder(actualOrder + 1);
+                        workflows.get(i + 1).setOrder(actualOrder);
+                    }
+                }
+                break;
+            }
+        }
 
     }
 
     @Override
-    public void updateWorkflowById(String worksheetId, String workflowId, UpdateWorkflowDTO updateWorkflowDTO) {
+    @Transactional
+    public void deleteWorkflowById(String worksheetId, String workflowId) {
+        Workflow workflow = getWorkflowById(worksheetId, workflowId);
 
+        if (workflow.getStatus() != Status.TODO) {
+            throw new InvalidOperationException("Workflow has started or the status is DONE", WrkshtErrors.DELETED_WORKFLOW);
+        }
+
+        workflowRepository.delete(workflow);
     }
 
     @Override
+    @Transactional
     public void updateWorksheetById(String worksheetId, UpdateWorksheetDTO updateWorksheetDTO) {
+        Worksheet worksheet = getWorksheetById(worksheetId);
 
+        if (worksheet.getStatus() == Status.DONE) {
+            throw new InvalidOperationException("Finished worksheet can not be updated", WrkshtErrors.WORKSHEET_ALREADY_FINISHED);
+        }
+
+        if (updateWorksheetDTO.getComment() != null) {
+            worksheet.setComment(updateWorksheetDTO.getComment());
+        }
+
+        if (updateWorksheetDTO.getCustomer() != null) {
+            worksheet.setCustomer(updateWorksheetDTO.getCustomer());
+        }
+
+        if (updateWorksheetDTO.getDeadLine() != null && updateWorksheetDTO.getDeadLine().toInstant().isAfter(Instant.now())) {
+            worksheet.setDeadline(updateWorksheetDTO.getDeadLine().toInstant());
+        }
+
+        if (updateWorksheetDTO.getName() != null) {
+            worksheet.setName(updateWorksheetDTO.getName());
+        }
+
+        if (updateWorksheetDTO.getOrderNumber() != null) {
+            worksheet.setOrderNumber(updateWorksheetDTO.getOrderNumber());
+        }
+
+        if (updateWorksheetDTO.getProductName() != null) {
+            worksheet.setProductName(updateWorksheetDTO.getProductName());
+        }
+
+        if (updateWorksheetDTO.getQuantity() != null) {
+            worksheet.setQuantity(updateWorksheetDTO.getQuantity());
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public void updateWorkflowById(String worksheetId, String workflowId, UpdateWorkflowDTO updateWorkflowDTO) {
+        Workflow workflow = getWorkflowById(worksheetId, workflowId);
+
+        if (workflow.getStatus() == Status.DONE) {
+            throw new InvalidOperationException("Finished workflow can not be updated", WrkshtErrors.WORKFLOW_ALREADY_FINISHED);
+        }
+
+        if (updateWorkflowDTO.getName() != null) {
+            workflow.setName(updateWorkflowDTO.getName());
+        }
+        if (updateWorkflowDTO.getShiftLeadComment() != null) {
+            workflow.setShiftLeadComment(updateWorkflowDTO.getShiftLeadComment());
+        }
+
+        if (updateWorkflowDTO.getStationId() != null && !updateWorkflowDTO.getStationId().equals("")) {
+            if (workflow.getStatus() == Status.TODO) {
+                Station station = stationService.getStationById(updateWorkflowDTO.getStationId());
+                workflow.getStation().getWorkflows().remove(workflow);
+                workflow.setStation(station);
+                workflowRepository.save(workflow);
+            } else {
+                throw new InvalidOperationException("Workflow is in progress can not be updated", WrkshtErrors.WORKFLOW_IN_PROGRESS);
+            }
+        }
     }
 }

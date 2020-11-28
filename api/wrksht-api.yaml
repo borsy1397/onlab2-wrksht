@@ -360,7 +360,6 @@ paths:
       description: Get all worksheets or filter them with status
       parameters:
         - schema:
-            type: string
             enum:
               - TODO
               - IN_PROGRESS
@@ -526,7 +525,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ListWorkflowCreationDTO'
+              $ref: '#/components/schemas/WorkflowCreationDTO'
   '/api/worksheets/{worksheetId}/workflows/{workflowId}':
     parameters:
       - schema:
@@ -584,6 +583,23 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateWorkflowDTO'
+    delete:
+      summary: ''
+      operationId: delete-workflow-by-id
+      tags:
+        - worksheet
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Delete workflow by id
   '/api/worksheets/{worksheetId}/workflows/{workflowId}/order':
     parameters:
       - schema:
@@ -1025,16 +1041,6 @@ components:
           type: string
         stationId:
           type: string
-        workerId:
-          type: string
-        order:
-          type: integer
-    ListWorkflowCreationDTO:
-      title: ListWorkflowCreationDTO
-      type: object
-      properties:
-        workflows:
-          $ref: '#/components/schemas/WorkflowCreationDTO'
     UpdateWorkflowDTO:
       title: UpdateWorkflowDTO
       type: object
@@ -1042,8 +1048,6 @@ components:
         name:
           type: string
         shiftLeadComment:
-          type: string
-        workerId:
           type: string
         stationId:
           type: string

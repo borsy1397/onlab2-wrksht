@@ -51,7 +51,7 @@ public class Worksheet {
     private String orderNumber;
     private Instant deadline;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private User creator;
 
     private String comment;

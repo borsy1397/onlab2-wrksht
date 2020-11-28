@@ -1,6 +1,7 @@
 package com.captainborsy.wrksht.mapper;
 
 import com.captainborsy.wrksht.api.model.StationDetailsDTO;
+import com.captainborsy.wrksht.api.model.WorkflowCreationDTO;
 import com.captainborsy.wrksht.api.model.WorkflowDetailsDTO;
 import com.captainborsy.wrksht.model.Station;
 import com.captainborsy.wrksht.model.Workflow;
@@ -23,5 +24,12 @@ public class WorkflowMapper {
 
     public static List<WorkflowDetailsDTO> mapWorkflowListToWorkflowDetailsDTOList(List<Workflow> workflows) {
         return workflows.stream().map(WorkflowMapper::mapWorkflowToWorkflowDetailsDTO).collect(Collectors.toList());
+    }
+
+    public static Workflow mapWorkflowCreationDTOtoWorkflow(WorkflowCreationDTO workflowCreationDTO) {
+        return Workflow.builder()
+                .name(workflowCreationDTO.getName())
+                .shiftLeadComment(workflowCreationDTO.getName())
+                .build();
     }
 }

@@ -1,10 +1,10 @@
 package com.captainborsy.wrksht.controller;
 
 import com.captainborsy.wrksht.api.WorksheetApi;
-import com.captainborsy.wrksht.api.model.ListWorkflowCreationDTO;
 import com.captainborsy.wrksht.api.model.OrderWorkflowDTO;
 import com.captainborsy.wrksht.api.model.UpdateWorkflowDTO;
 import com.captainborsy.wrksht.api.model.UpdateWorksheetDTO;
+import com.captainborsy.wrksht.api.model.WorkflowCreationDTO;
 import com.captainborsy.wrksht.api.model.WorkflowDetailsDTO;
 import com.captainborsy.wrksht.api.model.WorkflowStatusChangeDTO;
 import com.captainborsy.wrksht.api.model.WorksheetCreationDTO;
@@ -32,8 +32,8 @@ public class WorksheetController implements WorksheetApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowDetailsDTO> createWorkflowsForWorksheetByWorksheetId(String worksheetId, @Valid ListWorkflowCreationDTO listWorkflowCreationDTO) {
-        return ResponseEntity.ok(WorkflowMapper.mapWorkflowToWorkflowDetailsDTO(worksheetService.createWorkflowToWorksheet(worksheetId, listWorkflowCreationDTO)));
+    public ResponseEntity<WorkflowDetailsDTO> createWorkflowsForWorksheetByWorksheetId(String worksheetId, @Valid WorkflowCreationDTO workflowCreationDTO) {
+        return ResponseEntity.ok(WorkflowMapper.mapWorkflowToWorkflowDetailsDTO(worksheetService.createWorkflowToWorksheet(worksheetId, workflowCreationDTO)));
     }
 
     @Override
@@ -43,7 +43,13 @@ public class WorksheetController implements WorksheetApi {
 
     @Override
     public ResponseEntity<Void> deleteWorksheetById(String worksheetId) {
-        worksheetService.deleteById(worksheetId);
+        worksheetService.deleteWorksheetById(worksheetId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteWorkflowById(String worksheetId, String workflowId) {
+        worksheetService.deleteWorkflowById(worksheetId, workflowId);
         return ResponseEntity.noContent().build();
     }
 

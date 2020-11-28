@@ -8,12 +8,14 @@ import com.captainborsy.wrksht.errorhandling.exception.EntityNotFoundException;
 import com.captainborsy.wrksht.errorhandling.exception.InvalidOperationException;
 import com.captainborsy.wrksht.errorhandling.exception.InvalidTokenException;
 import com.captainborsy.wrksht.errorhandling.exception.NoUserInContextException;
+import com.captainborsy.wrksht.errorhandling.exception.UnprocessableEntityException;
 import com.captainborsy.wrksht.errorhandling.exception.UserAlreadyLoggedInException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 
 
 @ControllerAdvice
@@ -59,6 +61,12 @@ public class ExceptionHandlingController {
     public Object handleInvalidTokenException(Exception ex) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(WrkshtErrors.UNAUTHORIZED, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(UnprocessableEntityException.class)
+    public Object handleUnprocessableEntity(WrkshtException ex) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getError(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
 

@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 public class WrkshtErrors implements Serializable {
 
-
     protected final String key;
     protected final int code;
 
@@ -39,4 +38,11 @@ public class WrkshtErrors implements Serializable {
     public static final WrkshtErrors ADMIN_DELETE_ERROR = new WrkshtErrors("ADMIN_DELETE_ERROR", 1023);
     public static final WrkshtErrors USER_ALREADY_LOGGED_IN = new WrkshtErrors("USER_ALREADY_LOGGED_IN", 1024);
     public static final WrkshtErrors DELETED_USER = new WrkshtErrors("DELETED_USER", 1025);
+    public static final WrkshtErrors STATUS_CHANGE_ERROR = new WrkshtErrors("STATUS_CHANGE_ERROR", 1026);
+    public static final WrkshtErrors PARSE_ERROR = new WrkshtErrors("PARSE_ERROR", 1027);
+    public static final WrkshtErrors DELETED_WORKFLOW = new WrkshtErrors("DELETED_WORKFLOW", 1025);
+    public static final WrkshtErrors DEADLINE_ERROR = new WrkshtErrors("DEADLINE_ERROR", 1026);
+    public static final WrkshtErrors WORKSHEET_ALREADY_FINISHED = new WrkshtErrors("WORKSHEET_ALREADY_FINISHED", 1027);
+    public static final WrkshtErrors WORKFLOW_ALREADY_FINISHED = new WrkshtErrors("WORKFLOW_ALREADY_FINISHED", 1028);
+    public static final WrkshtErrors WORKFLOW_IN_PROGRESS = new WrkshtErrors("WORKFLOW_IN_PROGRESS", 1029);
 }
