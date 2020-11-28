@@ -8,11 +8,14 @@ import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
 import com.captainborsy.wrksht.errorhandling.exception.CredentialException;
 import com.captainborsy.wrksht.errorhandling.exception.EntityNotFoundException;
 import com.captainborsy.wrksht.errorhandling.exception.InvalidTokenException;
+import com.captainborsy.wrksht.errorhandling.exception.UserAlreadyLoggedInException;
 import com.captainborsy.wrksht.mapper.UserMapper;
 import com.captainborsy.wrksht.model.Role;
+import com.captainborsy.wrksht.model.Station;
 import com.captainborsy.wrksht.model.User;
 import com.captainborsy.wrksht.repository.UserRepository;
 import com.captainborsy.wrksht.service.AuthenticationService;
+import com.captainborsy.wrksht.service.StationService;
 import com.captainborsy.wrksht.service.TokenService;
 import com.captainborsy.wrksht.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,16 +38,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static final String INCORRECT = "Username or password incorrect";
     private static final String INVALID_PASSWORD = "Invalid current password during password change";
-    private static final String ACCESS_DENIED = "Access denied";
     private static final String USER_NOT_FOUND = "User not found";
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final StationService stationService;
 
 
     @Override
+    @Transactional
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
         if (!StringUtils.hasLength(loginRequestDTO.getUsername()) || !StringUtils.hasLength(loginRequestDTO.getPassword())) {
             throw new CredentialException(INCORRECT, WrkshtErrors.UNAUTHORIZED);
@@ -58,8 +62,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         User user = optionalUser.get();
 
+        if (user.isDeleted()) {
+            throw new CredentialException(INCORRECT, WrkshtErrors.UNAUTHORIZED);
+        }
+
         if (passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-            // TODO station bejelentkezés
+            if (loginRequestDTO.getStationId() != null && !loginRequestDTO.getStationId().equals("")) {
+                if (user.getLoggedInStation() != null) {
+                    throw new UserAlreadyLoggedInException("User already logged in station: " + user.getLoggedInStation().getId(), WrkshtErrors.USER_ALREADY_LOGGED_IN);
+                }
+
+                Station station = stationService.getStationById(loginRequestDTO.getStationId());
+
+                user.setLoggedInStation(station);
+                station.setLoggedInUser(user);
+
+                userRepository.save(user);
+            }
             return createLoginResponseDTO(user);
         } else {
             throw new CredentialException(INVALID_PASSWORD, WrkshtErrors.INVALID_PASSWORD);
@@ -110,6 +129,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         User user = u.get();
+
+        if (user.isDeleted()) {
+            throw new CredentialException(INCORRECT, WrkshtErrors.UNAUTHORIZED);
+        }
 
         String accessToken = tokenService.generateAccessToken(user.getUsername(), user.getId(), user.getRole());
         String refreshToken = tokenService.generateRefreshToken(user.getUsername(), user.getId(), user.getRole());

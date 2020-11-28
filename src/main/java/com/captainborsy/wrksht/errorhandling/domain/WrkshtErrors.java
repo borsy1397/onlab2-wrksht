@@ -36,4 +36,7 @@ public class WrkshtErrors implements Serializable {
     public static final WrkshtErrors TRUCK_IS_ON_WAY = new WrkshtErrors("TRUCK_IS_ON_WAY", 1014);
     public static final WrkshtErrors NEGATIVE_QUANTITY = new WrkshtErrors("NEGATIVE_QUANTITY", 1015);
     public static final WrkshtErrors USER_INFORMATION_NOT_EXISTS = new WrkshtErrors("USER_INFORMATION_NOT_EXISTS", 1022);
+    public static final WrkshtErrors ADMIN_DELETE_ERROR = new WrkshtErrors("ADMIN_DELETE_ERROR", 1023);
+    public static final WrkshtErrors USER_ALREADY_LOGGED_IN = new WrkshtErrors("USER_ALREADY_LOGGED_IN", 1024);
+    public static final WrkshtErrors DELETED_USER = new WrkshtErrors("DELETED_USER", 1025);
 }

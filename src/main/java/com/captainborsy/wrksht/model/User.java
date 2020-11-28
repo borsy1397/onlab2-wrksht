@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -58,7 +59,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @OneToOne(mappedBy = "loggedInUser", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "loggedInUser", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Station loggedInStation;
 
     @ColumnDefault("false")

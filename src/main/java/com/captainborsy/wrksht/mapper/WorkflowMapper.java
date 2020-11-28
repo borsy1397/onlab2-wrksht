@@ -16,8 +16,6 @@ public class WorkflowMapper {
         return WorkflowDetailsDTO.builder()
                 .id(workflow.getId())
                 .name(workflow.getName())
-                .or
-                .loggedInUserId(station.getLoggedInUser() != null ? station.getLoggedInUser().getId() : null)
                 //.createdAt(user.getCreatedAt().atOffset(ZoneOffset.UTC))
                 //.updatedAt(user.getUpdatedAt().atOffset(ZoneOffset.UTC))
                 .build();

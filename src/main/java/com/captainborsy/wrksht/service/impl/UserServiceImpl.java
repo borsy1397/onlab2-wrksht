@@ -5,6 +5,7 @@ import com.captainborsy.wrksht.api.model.UserUpdateDTO;
 import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
 import com.captainborsy.wrksht.errorhandling.exception.ConflictException;
 import com.captainborsy.wrksht.errorhandling.exception.EntityNotFoundException;
+import com.captainborsy.wrksht.errorhandling.exception.InvalidOperationException;
 import com.captainborsy.wrksht.errorhandling.exception.NoUserInContextException;
 import com.captainborsy.wrksht.mapper.UserMapper;
 import com.captainborsy.wrksht.model.Role;
@@ -81,7 +82,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public List<User> getUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllByDeletedIs(false);
     }
 
     @Override
@@ -94,6 +95,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateUser(String id, UserUpdateDTO user) {
         User u = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND, WrkshtErrors.ENTITY_NOT_FOUND));
+
+        if (u.isDeleted()) {
+            throw new InvalidOperationException("Deleted user can not be updated", WrkshtErrors.DELETED_USER);
+        }
+
         User updateUser = fillUpdateUser(u, user);
         return userRepository.save(updateUser);
     }
@@ -102,6 +108,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(String id) {
         User u = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND, WrkshtErrors.ENTITY_NOT_FOUND));
+
+        if (u.getRole() == Role.ADMIN) {
+            throw new InvalidOperationException("Admin can not be able to delete another admin", WrkshtErrors.ADMIN_DELETE_ERROR);
+        }
+
         u.setDeleted(true);
     }
 
@@ -113,13 +124,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void logout() {
-
+        logoutUser(getCurrentUser());
     }
 
     @Override
+    @Transactional
     public void forceLogout(String id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND, WrkshtErrors.ENTITY_NOT_FOUND));
+        logoutUser(user);
+    }
 
+    private void logoutUser(User user) {
+        if (user.getLoggedInStation() != null) {
+            user.getLoggedInStation().setLoggedInUser(null);
+            user.setLoggedInStation(null);
+            userRepository.save(user);
+        }
     }
 
     private User fillUpdateUser(User user, UserUpdateDTO profileDTO) {

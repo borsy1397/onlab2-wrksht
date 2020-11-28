@@ -28,6 +28,8 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public Station getStationById(String stationId) {
+
+        // TODO check is deleted
         return null;
     }
 

@@ -1,0 +1,40 @@
+version: '3.3'
+
+services:
+  nginx:
+    image: nginx:1.19.4
+    container_name: wrksht-nginx
+    volumes:
+      - ./ssl/nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl/certs:/etc/nginx/certs
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - backend
+  database:
+    image: postgres:12.1
+    container_name: wrksht-postgres
+    restart: unless-stopped
+    volumes:
+      - ./data-wrksht:/var/lib/postgresql
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: wrksht
+      PGDATA: /var/lib/postgresql/data/pgdata
+  backend:
+    image: borsybela/wrksht-backend:v1
+    container_name: wrksht-backend
+    restart: unless-stopped
+    expose:
+      - '8080'
+    environment:
+      SPRING_DATASOURCE_USERNAME: 'postgres'
+      SPRING_DATASOURCE_PASSWORD: 'postgres'
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://database:5432/wrksht'
+      WRKSHT_WEB_HOST: 'localhost:8080'
+      WRKSHT_SECURITY_TOKEN_SECRET: tokensecret
+      WRKSHT_ADMIN_USERNAME: admin
+      WRKSHT_ADMIN_PASSWORD: admin
+    depends_on:
+      - database
