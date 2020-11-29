@@ -18,7 +18,6 @@ import com.captainborsy.wrksht.model.Status;
 import com.captainborsy.wrksht.model.User;
 import com.captainborsy.wrksht.model.Workflow;
 import com.captainborsy.wrksht.model.Worksheet;
-import com.captainborsy.wrksht.repository.StationRepository;
 import com.captainborsy.wrksht.repository.WorkflowRepository;
 import com.captainborsy.wrksht.repository.WorksheetRepository;
 import com.captainborsy.wrksht.service.DocxCreatorService;
@@ -36,8 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
@@ -65,7 +62,8 @@ public class WorksheetServiceImpl implements WorksheetService {
         Workflow workflow = getWorkflowById(worksheetId, workflowId);
         Worksheet worksheet = getWorksheetById(worksheetId);
 
-        if (workflow.getStatus() == Status.TODO && workflowStatusChangeDTO.getToStatus() == WorkflowStatusChangeDTO.ToStatusEnum.START) {
+
+        if (workflow.getStatus() == Status.TODO && workflowStatusChangeDTO.getToStatus().equals("START")) {
             User user = userService.getCurrentUser();
 
             workflow.setStartedAt(Instant.now());
@@ -80,7 +78,7 @@ public class WorksheetServiceImpl implements WorksheetService {
             return;
         }
 
-        if (workflow.getStatus() == Status.IN_PROGRESS && workflowStatusChangeDTO.getToStatus() == WorkflowStatusChangeDTO.ToStatusEnum.STOP) {
+        if (workflow.getStatus() == Status.IN_PROGRESS && workflowStatusChangeDTO.getToStatus().equals("STOP")) {
 
             workflow.setStoppedAt(Instant.now());
             workflow.setStatus(Status.DONE);
@@ -189,16 +187,6 @@ public class WorksheetServiceImpl implements WorksheetService {
         return worksheetRepository.findByStatusAndIsDeleted(parsedStatus, false);
     }
 
-    private Status parseStatus(String status) {
-        Status parsedStatus;
-        try {
-            parsedStatus = Status.valueOf(status);
-        } catch (IllegalArgumentException e) {
-            throw new UnprocessableEntityException("Parsing status (" + status + ") was failed", WrkshtErrors.PARSE_ERROR);
-        }
-        return parsedStatus;
-    }
-
     @Override
     @Transactional
     public void orderWorkflowById(String worksheetId, String workflowId, OrderWorkflowDTO orderWorkflowDTO) {
@@ -223,7 +211,6 @@ public class WorksheetServiceImpl implements WorksheetService {
                 break;
             }
         }
-
     }
 
     @Override
@@ -266,10 +253,6 @@ public class WorksheetServiceImpl implements WorksheetService {
         docxWorksheet.setDocxTableRowWorkflows(docxTableRowWorkflows);
 
         docxCreatorService.export(docxWorksheet, os);
-    }
-
-    private DocxTableRowWorkflow mapToDocxTableRowWorkflow(Workflow workflow) {
-        return new DocxTableRowWorkflow(workflow.getName(), workflow.getShiftLeadComment(), workflow.getStatus().getDocxStatus(), workflow.getStartedAt() != null ? DATE_TIME_FORMATTER.format(workflow.getStartedAt()) : "-");
     }
 
     @Override
@@ -350,4 +333,19 @@ public class WorksheetServiceImpl implements WorksheetService {
             }
         }
     }
+
+    private Status parseStatus(String status) {
+        Status parsedStatus;
+        try {
+            parsedStatus = Status.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            throw new UnprocessableEntityException("Parsing status (" + status + ") was failed", WrkshtErrors.PARSE_ERROR);
+        }
+        return parsedStatus;
+    }
+
+    private DocxTableRowWorkflow mapToDocxTableRowWorkflow(Workflow workflow) {
+        return new DocxTableRowWorkflow(workflow.getName(), workflow.getShiftLeadComment(), workflow.getStatus().getDocxStatus(), workflow.getStartedAt() != null ? DATE_TIME_FORMATTER.format(workflow.getStartedAt()) : "-");
+    }
+
 }

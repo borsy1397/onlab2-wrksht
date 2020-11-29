@@ -1197,13 +1197,8 @@ components:
       properties:
         toStatus:
           type: string
-          enum:
-            - START
-            - STOP
         toStatuss:
           type: string
-      required:
-        - toStatus
     StationDetailsDTO:
       title: StationDetailsDTO
       type: object

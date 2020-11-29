@@ -10,6 +10,7 @@ import com.captainborsy.wrksht.errorhandling.exception.InvalidTokenException;
 import com.captainborsy.wrksht.errorhandling.exception.NoUserInContextException;
 import com.captainborsy.wrksht.errorhandling.exception.UnprocessableEntityException;
 import com.captainborsy.wrksht.errorhandling.exception.UserAlreadyLoggedInException;
+import com.captainborsy.wrksht.errorhandling.exception.WorkflowStatusChangingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -45,7 +46,7 @@ public class ExceptionHandlingController {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(UserAlreadyLoggedInException.class)
+    @ExceptionHandler({UserAlreadyLoggedInException.class, WorkflowStatusChangingException.class})
     public Object handleUserAlreadyLoggedInException(WrkshtException ex) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getError(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.METHOD_NOT_ALLOWED);
