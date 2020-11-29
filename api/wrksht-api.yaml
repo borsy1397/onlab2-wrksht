@@ -976,6 +976,8 @@ components:
       properties:
         refreshToken:
           type: string
+        refreshTokenn:
+          type: string
     UserRegistrationDTO:
       title: UserRegistrationDTO
       type: object
@@ -1060,6 +1062,8 @@ components:
           enum:
             - UP
             - DOWN
+        directionn:
+          type: string
       required:
         - direction
     WorkflowDetailsDTO:
@@ -1136,10 +1140,6 @@ components:
           type: string
         comment:
           type: string
-        workflows:
-          type: array
-          items:
-            $ref: ''
         status:
           type: string
           enum:
@@ -1160,6 +1160,8 @@ components:
       properties:
         name:
           type: string
+        namee:
+          type: string
     WorkflowStatusChangeDTO:
       title: WorkflowStatusChangeDTO
       type: object
@@ -1169,6 +1171,8 @@ components:
           enum:
             - START
             - STOP
+        toStatuss:
+          type: string
       required:
         - toStatus
     StationDetailsDTO:

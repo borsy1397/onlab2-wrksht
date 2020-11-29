@@ -5,21 +5,24 @@ import com.captainborsy.wrksht.api.model.UserDTO;
 import com.captainborsy.wrksht.model.Station;
 import com.captainborsy.wrksht.model.User;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class StationMapper {
 
-    private StationMapper() {}
+    private StationMapper() {
+    }
 
     public static StationDetailsDTO mapStationToStationDetailsDTO(Station station) {
         return StationDetailsDTO.builder()
                 .id(station.getId())
                 .name(station.getName())
                 .set(station.isSet())
+                .deleted(station.isDeleted())
                 .loggedInUserId(station.getLoggedInUser() != null ? station.getLoggedInUser().getId() : null)
-                //.createdAt(user.getCreatedAt().atOffset(ZoneOffset.UTC))
-                //.updatedAt(user.getUpdatedAt().atOffset(ZoneOffset.UTC))
+                .createdAt(station.getCreatedAt().atOffset(ZoneOffset.UTC))
+                .updatedAt(station.getUpdatedAt().atOffset(ZoneOffset.UTC))
                 .build();
     }
 

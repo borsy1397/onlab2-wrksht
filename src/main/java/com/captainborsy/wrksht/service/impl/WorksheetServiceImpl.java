@@ -49,6 +49,7 @@ public class WorksheetServiceImpl implements WorksheetService {
     @Transactional
     public void changeWorkflowStatus(String worksheetId, String workflowId, WorkflowStatusChangeDTO workflowStatusChangeDTO) {
         Workflow workflow = getWorkflowById(worksheetId, workflowId);
+        Worksheet worksheet = getWorksheetById(worksheetId);
 
         if (workflow.getStatus() == Status.TODO && workflowStatusChangeDTO.getToStatus() == WorkflowStatusChangeDTO.ToStatusEnum.START) {
             User user = userService.getCurrentUser();
@@ -58,7 +59,7 @@ public class WorksheetServiceImpl implements WorksheetService {
             workflow.setWorker(user);
             user.getWorkflows().add(workflow);
 
-            // TODO worksheetnek is beállítani?
+            worksheet.setStatus(Status.IN_PROGRESS);
 
             workflowRepository.save(workflow);
 
@@ -70,7 +71,20 @@ public class WorksheetServiceImpl implements WorksheetService {
             workflow.setStoppedAt(Instant.now());
             workflow.setStatus(Status.DONE);
 
-            // TODO csekkolni, hogy vége van-e már mindennek, mert akkor a worksheetnek is vége
+            List<Workflow> workflows = workflowRepository.findByWorksheetId(worksheetId);
+
+            boolean isFinishedWorksheet = true;
+
+            for (Workflow w : workflows) {
+                if (w.getStatus() != Status.DONE && !w.getId().equals(workflowId)) {
+                    isFinishedWorksheet = false;
+                    break;
+                }
+            }
+
+            if (isFinishedWorksheet) {
+                worksheet.setStatus(Status.DONE);
+            }
 
             return;
         }

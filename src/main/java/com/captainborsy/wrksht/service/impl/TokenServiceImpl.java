@@ -21,12 +21,8 @@ public class TokenServiceImpl implements TokenService {
     public static final String USER_ID_CLAIM = "userid";
     public static final String ROLE_CLAIM = "role";
     private static final String TOKEN_ISSUER = "captainborsy";
-    private static final String CONFIRM_EMAIL_TOKEN_SUBJECT = "confirmemail";
-    private static final String PASSWORD_SETTING_TOKEN_SUBJECT = "passwordsetting";
     private static final String ACCESS_TOKEN_SUBJECT = "accesstoken";
     private static final String REFRESH_TOKEN_SUBJECT = "refreshtoken";
-    private static final int CONFIRM_EMAIL_TOKEN_TTL = 5 * 24 * 60 * 60 * 1000; // 5 days
-    private static final int PASSWORD_SETTING_TOKEN_TTL = 5 * 24 * 60 * 60 * 1000; // 5 days
     private static final int ACCESS_TOKEN_TTL = 30 * 60 * 1000; // 30 minutes
     private static final int REFRESH_TOKEN_TTL = 365; // 365 days
 

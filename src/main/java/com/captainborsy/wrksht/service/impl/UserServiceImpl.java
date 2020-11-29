@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void makeAdmin(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND, WrkshtErrors.ENTITY_NOT_FOUND));
+        User user = getUserById(id);
         user.setRole(Role.ADMIN);
     }
 
@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void forceLogout(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND, WrkshtErrors.ENTITY_NOT_FOUND));
+        User user = getUserById(id);
         logoutUser(user);
     }
 

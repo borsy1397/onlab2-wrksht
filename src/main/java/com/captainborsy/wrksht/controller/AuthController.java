@@ -9,7 +9,6 @@ import com.captainborsy.wrksht.api.model.TokensDTO;
 import com.captainborsy.wrksht.security.AuthoritiesConstants;
 import com.captainborsy.wrksht.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +24,7 @@ public class AuthController implements AuthApi {
     private final AuthenticationService authenticationService;
 
     @Override
-    @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_WORKER})
+    @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_SHIFT_LEAD, AuthoritiesConstants.ROLE_WORKER})
     public ResponseEntity<Void> changePassword(@Valid PasswordChangeDTO passwordChangeDTO) {
         authenticationService.changePasswordUser(passwordChangeDTO);
         return ResponseEntity.noContent().build();
