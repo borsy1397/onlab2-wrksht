@@ -9,16 +9,25 @@ import com.captainborsy.wrksht.api.model.WorkflowDetailsDTO;
 import com.captainborsy.wrksht.api.model.WorkflowStatusChangeDTO;
 import com.captainborsy.wrksht.api.model.WorksheetCreationDTO;
 import com.captainborsy.wrksht.api.model.WorksheetDetailsDTO;
+import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
+import com.captainborsy.wrksht.errorhandling.exception.EntityNotFoundException;
+import com.captainborsy.wrksht.errorhandling.exception.UnprocessableEntityException;
 import com.captainborsy.wrksht.mapper.WorkflowMapper;
 import com.captainborsy.wrksht.mapper.WorksheetMapper;
 import com.captainborsy.wrksht.security.AuthoritiesConstants;
 import com.captainborsy.wrksht.service.WorksheetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -51,6 +60,22 @@ public class WorksheetController implements WorksheetApi {
     public ResponseEntity<Void> deleteWorksheetById(String worksheetId) {
         worksheetService.deleteWorksheetById(worksheetId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Resource> exportWorksheet(String worksheetId) {
+        String filename = "export_worksheet.docx";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
+        headers.add(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            worksheetService.export(worksheetId, os);
+            ByteArrayResource resource = new ByteArrayResource(os.toByteArray());
+            return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            throw new UnprocessableEntityException("Worksheet export has failed", WrkshtErrors.USER_ALREADY_LOGGED_IN);
+        }
     }
 
     @Override

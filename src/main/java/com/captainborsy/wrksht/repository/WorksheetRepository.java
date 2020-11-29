@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface WorksheetRepository extends JpaRepository<Worksheet, String> {
-    List<Worksheet> findByStatusAndDeletedIs(Status status, boolean isDeleted);
+    List<Worksheet> findByStatusAndIsDeleted(Status status, boolean isDeleted);
 
-    List<Worksheet> findByDeletedIs(boolean isDeleted);
+    List<Worksheet> findByIsDeleted(boolean isDeleted);
 }

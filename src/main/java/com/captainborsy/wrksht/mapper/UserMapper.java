@@ -18,10 +18,11 @@ public class UserMapper {
                 .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .deleted(user.isDeleted())
                 .username(user.getUsername())
                 .role(UserDTO.RoleEnum.valueOf(user.getRole().toString()))
-                //.createdAt(user.getCreatedAt().atOffset(ZoneOffset.UTC))
-                //.updatedAt(user.getUpdatedAt().atOffset(ZoneOffset.UTC))
+                .createdAt(user.getCreatedAt().atOffset(ZoneOffset.UTC))
+                .updatedAt(user.getUpdatedAt().atOffset(ZoneOffset.UTC))
                 .build();
     }
 

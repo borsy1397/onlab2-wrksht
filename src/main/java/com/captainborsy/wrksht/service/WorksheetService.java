@@ -9,6 +9,7 @@ import com.captainborsy.wrksht.api.model.WorksheetCreationDTO;
 import com.captainborsy.wrksht.model.Workflow;
 import com.captainborsy.wrksht.model.Worksheet;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public interface WorksheetService {
@@ -35,4 +36,6 @@ public interface WorksheetService {
     void updateWorksheetById(String worksheetId, UpdateWorksheetDTO updateWorksheetDTO);
 
     void deleteWorkflowById(String worksheetId, String workflowId);
+
+    void export(String worksheetId, ByteArrayOutputStream os);
 }

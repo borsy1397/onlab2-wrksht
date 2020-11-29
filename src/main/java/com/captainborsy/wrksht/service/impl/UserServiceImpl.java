@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public List<User> getUsers() {
-        return userRepository.findAllByDeletedIs(false);
+        return userRepository.findAllByIsDeleted(false);
     }
 
     @Override

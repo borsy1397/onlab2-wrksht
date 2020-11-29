@@ -45,4 +45,5 @@ public class WrkshtErrors implements Serializable {
     public static final WrkshtErrors WORKSHEET_ALREADY_FINISHED = new WrkshtErrors("WORKSHEET_ALREADY_FINISHED", 1027);
     public static final WrkshtErrors WORKFLOW_ALREADY_FINISHED = new WrkshtErrors("WORKFLOW_ALREADY_FINISHED", 1028);
     public static final WrkshtErrors WORKFLOW_IN_PROGRESS = new WrkshtErrors("WORKFLOW_IN_PROGRESS", 1029);
+    public static final WrkshtErrors EXPORT_ERROR = new WrkshtErrors("EXPORT_ERROR", 1030);
 }

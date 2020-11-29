@@ -14,5 +14,5 @@ public interface StationRepository extends JpaRepository<Station, String> {
 
     Optional<Station> findByNameAndIdNot(String name, String id);
 
-    List<Station> findAllByDeletedIs(boolean deleted);
+    List<Station> findAllByIsDeleted(boolean deleted);
 }

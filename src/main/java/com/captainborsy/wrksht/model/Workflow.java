@@ -43,13 +43,13 @@ public class Workflow {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Worksheet worksheet;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private User worker;
 
-    private Integer order;
+    private Integer orderd;
 
     private String shiftLeadComment;
 

@@ -18,19 +18,32 @@ import com.captainborsy.wrksht.model.Status;
 import com.captainborsy.wrksht.model.User;
 import com.captainborsy.wrksht.model.Workflow;
 import com.captainborsy.wrksht.model.Worksheet;
+import com.captainborsy.wrksht.repository.StationRepository;
 import com.captainborsy.wrksht.repository.WorkflowRepository;
 import com.captainborsy.wrksht.repository.WorksheetRepository;
+import com.captainborsy.wrksht.service.DocxCreatorService;
 import com.captainborsy.wrksht.service.StationService;
 import com.captainborsy.wrksht.service.UserService;
 import com.captainborsy.wrksht.service.WorksheetService;
+import com.captainborsy.wrksht.service.export.DocxTableRowWorkflow;
+import com.captainborsy.wrksht.service.export.DocxWorksheet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.captainborsy.wrksht.service.impl.DocxCreatorServiceImpl.DATE_TIME_FORMATTER;
 
 @Service
 @Slf4j
@@ -44,6 +57,7 @@ public class WorksheetServiceImpl implements WorksheetService {
     private final WorkflowRepository workflowRepository;
     private final UserService userService;
     private final StationService stationService;
+    private final DocxCreatorService docxCreatorService;
 
     @Override
     @Transactional
@@ -100,11 +114,15 @@ public class WorksheetServiceImpl implements WorksheetService {
         Workflow workflow = WorkflowMapper.mapWorkflowCreationDTOtoWorkflow(workflowCreationDTO);
 
         List<Workflow> workflows = worksheet.getWorkflows();
-        workflows.sort(Comparator.comparing(Workflow::getOrder));
+        workflows.sort(Comparator.comparing(Workflow::getOrderd));
 
-        workflow.setOrder(workflows.size() + 1);
+        workflow.setStatus(Status.TODO);
+        workflow.setOrderd(workflows.size() + 1);
         workflow.setStation(station);
         station.getWorkflows().add(workflow);
+        worksheet.getWorkflows().add(workflow);
+        workflow.setWorksheet(worksheet);
+
 
         return workflowRepository.save(workflow);
     }
@@ -163,12 +181,12 @@ public class WorksheetServiceImpl implements WorksheetService {
     public List<Worksheet> getWorksheets(String status) {
 
         if (status == null) {
-            return worksheetRepository.findByDeletedIs(false);
+            return worksheetRepository.findByIsDeleted(false);
         }
 
         Status parsedStatus = parseStatus(status);
 
-        return worksheetRepository.findByStatusAndDeletedIs(parsedStatus, false);
+        return worksheetRepository.findByStatusAndIsDeleted(parsedStatus, false);
     }
 
     private Status parseStatus(String status) {
@@ -185,27 +203,73 @@ public class WorksheetServiceImpl implements WorksheetService {
     @Transactional
     public void orderWorkflowById(String worksheetId, String workflowId, OrderWorkflowDTO orderWorkflowDTO) {
         List<Workflow> workflows = workflowRepository.findByWorksheetId(worksheetId);
-        workflows.sort(Comparator.comparing(Workflow::getOrder));
+        workflows.sort(Comparator.comparing(Workflow::getOrderd));
 
         for (int i = 0; i < workflows.size(); i++) {
             Workflow actual = workflows.get(i);
-            int actualOrder = actual.getOrder();
+            int actualOrder = actual.getOrderd();
             if (actual.getId().equals(workflowId)) {
                 if (orderWorkflowDTO.getDirection() == OrderWorkflowDTO.DirectionEnum.DOWN) {
                     if (actualOrder != 1) {
-                        actual.setOrder(actualOrder - 1);
-                        workflows.get(i - 1).setOrder(actualOrder);
+                        actual.setOrderd(actualOrder - 1);
+                        workflows.get(i - 1).setOrderd(actualOrder);
                     }
                 } else {
                     if (actualOrder != workflows.size()) {
-                        actual.setOrder(actualOrder + 1);
-                        workflows.get(i + 1).setOrder(actualOrder);
+                        actual.setOrderd(actualOrder + 1);
+                        workflows.get(i + 1).setOrderd(actualOrder);
                     }
                 }
                 break;
             }
         }
 
+    }
+
+    @Override
+    @Transactional
+    public void export(String worksheetId, ByteArrayOutputStream os) {
+        Worksheet worksheet = getWorksheetById(worksheetId);
+
+
+        DocxWorksheet docxWorksheet = DocxWorksheet.builder()
+                .name(worksheet.getName())
+                .productName(worksheet.getProductName())
+                .quantity(worksheet.getQuantity().toString())
+                .customer(worksheet.getCustomer())
+                .orderNumber(worksheet.getOrderNumber())
+                .deadline(DATE_TIME_FORMATTER.format(worksheet.getDeadline().truncatedTo(ChronoUnit.MINUTES)))
+                .status(worksheet.getStatus().getDocxStatus())
+                .createdAt(DATE_TIME_FORMATTER.format(worksheet.getCreatedAt().truncatedTo(ChronoUnit.MINUTES)))
+                .isDeleted(worksheet.isDeleted() ? "A munkalap TÖRÖLVE lett" : "")
+                .creator(worksheet.getCreator().getLastName() + " " + worksheet.getCreator().getFirstName())
+                .build();
+
+        List<Workflow> workflows = worksheet.getWorkflows();
+
+        if (workflows.isEmpty()) {
+            try {
+                XWPFDocument document = new XWPFDocument();
+                document.write(os);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        workflows.sort(Comparator.comparing(Workflow::getOrderd));
+
+        DocxTableRowWorkflow firstRow = new DocxTableRowWorkflow("Név", "Megjegyzés", "Állapot", "Kezdés ideje");
+        List<DocxTableRowWorkflow> docxTableRowWorkflows = workflows.stream().map(this::mapToDocxTableRowWorkflow).collect(Collectors.toList());
+
+        docxTableRowWorkflows.add(0, firstRow);
+
+        docxWorksheet.setDocxTableRowWorkflows(docxTableRowWorkflows);
+
+        docxCreatorService.export(docxWorksheet, os);
+    }
+
+    private DocxTableRowWorkflow mapToDocxTableRowWorkflow(Workflow workflow) {
+        return new DocxTableRowWorkflow(workflow.getName(), workflow.getShiftLeadComment(), workflow.getStatus().getDocxStatus(), workflow.getStartedAt() != null ? DATE_TIME_FORMATTER.format(workflow.getStartedAt()) : "-");
     }
 
     @Override

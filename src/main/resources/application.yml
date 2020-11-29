@@ -32,7 +32,7 @@ spring:
 
   datasource:
     username: postgres
-    password: password
+    password: postgres
     url: jdbc:postgresql://localhost:15432/wrksht
     driver-class-name: org.postgresql.Driver
     initialization-mode: always

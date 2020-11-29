@@ -44,7 +44,7 @@ public class StationServiceImpl implements StationService {
     @Override
     @Transactional
     public List<Station> getAllStation() {
-        return stationRepository.findAllByDeletedIs(false);
+        return stationRepository.findAllByIsDeleted(false);
     }
 
     @Override
