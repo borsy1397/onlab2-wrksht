@@ -42,25 +42,7 @@ public class DocxCreatorServiceImpl implements DocxCreatorService {
 
     @Override
     public void export(DocxWorksheet docxWorksheet, ByteArrayOutputStream os) {
-
-        /*POIFSFileSystem fs = null;
-        try {
-            fs = new POIFSFileSystem(new FileInputStream(filePath));
-            HWPFDocument doc = new HWPFDocument(fs);
-            doc = replaceText(doc, "$deadline", "MyValue1");
-
-            saveWord(filePath, doc);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-
         XWPFDocument document = new XWPFDocument();
-
-        //XWPFStyles styles = document.createStyles();
-        //addCustomHeadingStyle(styles, heading1, 1, 36, "000000");
 
         addParagraph(document, "Munkalap név: ", docxWorksheet.getName(), false);
         addParagraph(document, "Termék neve: ", docxWorksheet.getProductName(), false);
@@ -74,97 +56,12 @@ public class DocxCreatorServiceImpl implements DocxCreatorService {
 
         addNewTable("Munkafolyamatok", document, docxWorksheet.getDocxTableRowWorkflows(), false);
 
-
         try {
             document.write(os);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-
-    private void addCustomHeadingStyle(XWPFStyles styles, String strStyleId, int headingLevel, int pointSize, String hexColor) {
-        CTStyle ctStyle = CTStyle.Factory.newInstance();
-        ctStyle.setStyleId(strStyleId);
-
-        CTString styleName = CTString.Factory.newInstance();
-        styleName.setVal(strStyleId);
-        ctStyle.setName(styleName);
-
-        CTDecimalNumber indentNumber = CTDecimalNumber.Factory.newInstance();
-        indentNumber.setVal(BigInteger.valueOf(headingLevel));
-
-        ctStyle.setUiPriority(indentNumber);
-
-        CTOnOff onoffnull = CTOnOff.Factory.newInstance();
-        ctStyle.setUnhideWhenUsed(onoffnull);
-
-        ctStyle.setQFormat(onoffnull);
-
-        CTPPr ppr = CTPPr.Factory.newInstance();
-        ppr.setOutlineLvl(indentNumber);
-        ctStyle.setPPr(ppr);
-
-        XWPFStyle style = new XWPFStyle(ctStyle);
-
-        CTHpsMeasure size = CTHpsMeasure.Factory.newInstance();
-        size.setVal(new BigInteger(String.valueOf(pointSize)));
-        CTHpsMeasure size2 = CTHpsMeasure.Factory.newInstance();
-        size2.setVal(new BigInteger("24"));
-
-        CTFonts fonts = CTFonts.Factory.newInstance();
-        fonts.setAscii("Loma");
-
-        CTRPr rpr = CTRPr.Factory.newInstance();
-        rpr.setRFonts(fonts);
-        rpr.setSz(size);
-        rpr.setSzCs(size2);
-
-        CTColor color = CTColor.Factory.newInstance();
-        color.setVal(hexToBytes(hexColor));
-        rpr.setColor(color);
-        style.getCTStyle().setRPr(rpr);
-
-        style.setType(STStyleType.PARAGRAPH);
-        styles.addStyle(style);
-    }
-
-    private byte[] hexToBytes(String hexString) {
-        HexBinaryAdapter adapter = new HexBinaryAdapter();
-        return adapter.unmarshal(hexString);
-    }
-
-
-/*
-    private static HWPFDocument replaceText(HWPFDocument doc, String findText, String replaceText) {
-        Range r1 = doc.getRange();
-
-        for (int i = 0; i < r1.numSections(); ++i) {
-            Section s = r1.getSection(i);
-            for (int x = 0; x < s.numParagraphs(); x++) {
-                Paragraph p = s.getParagraph(x);
-                for (int z = 0; z < p.numCharacterRuns(); z++) {
-                    CharacterRun run = p.getCharacterRun(z);
-                    String text = run.text();
-                    if (text.contains(findText)) {
-                        run.replaceText(findText, replaceText);
-                    }
-                }
-            }
-        }
-        return doc;
-    }
-
-    private static void saveWord(String filePath, HWPFDocument doc) throws FileNotFoundException, IOException {
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(filePath);
-            doc.write(out);
-        } finally {
-            out.close();
-        }
-    }
-*/
 
 
     public void addParagraph(XWPFDocument document, String title, String details, boolean pageBreak) {

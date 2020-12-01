@@ -36,7 +36,6 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationFacade authenticationFacade;
 
     // TODO user statisztikák
-    // TODO docx export
 
     @Override
     @Transactional
