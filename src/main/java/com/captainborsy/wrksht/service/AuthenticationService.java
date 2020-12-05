@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface AuthenticationService {
 
-    LoginResponseDTO login(LoginRequestDTO loginRequestDTODTO) throws IOException;
+    LoginResponseDTO login(LoginRequestDTO loginRequestDTODTO);
 
     void changePasswordUser(PasswordChangeDTO passwordChangeDTO);
 

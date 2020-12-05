@@ -1,5 +1,7 @@
 package com.captainborsy.wrksht.service.impl;
 
+import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
+import com.captainborsy.wrksht.errorhandling.exception.ExportException;
 import com.captainborsy.wrksht.service.DocxCreatorService;
 import com.captainborsy.wrksht.service.export.DocxTableRowWorkflow;
 import com.captainborsy.wrksht.service.export.DocxWorksheet;
@@ -7,24 +9,11 @@ import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFStyle;
-import org.apache.poi.xwpf.usermodel.XWPFStyles;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTColor;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDecimalNumber;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFonts;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTHpsMeasure;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTOnOff;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STStyleType;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -59,7 +48,7 @@ public class DocxCreatorServiceImpl implements DocxCreatorService {
         try {
             document.write(os);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ExportException("Error while exporting", WrkshtErrors.EXPORT_ERROR);
         }
     }
 

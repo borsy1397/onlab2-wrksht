@@ -8,6 +8,7 @@ import com.captainborsy.wrksht.api.model.WorkflowStatusChangeDTO;
 import com.captainborsy.wrksht.api.model.WorksheetCreationDTO;
 import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
 import com.captainborsy.wrksht.errorhandling.exception.EntityNotFoundException;
+import com.captainborsy.wrksht.errorhandling.exception.ExportException;
 import com.captainborsy.wrksht.errorhandling.exception.InvalidOperationException;
 import com.captainborsy.wrksht.errorhandling.exception.UnprocessableEntityException;
 import com.captainborsy.wrksht.errorhandling.exception.WorkflowStatusChangingException;
@@ -218,7 +219,6 @@ public class WorksheetServiceImpl implements WorksheetService {
     public void export(String worksheetId, ByteArrayOutputStream os) {
         Worksheet worksheet = getWorksheetById(worksheetId);
 
-
         DocxWorksheet docxWorksheet = DocxWorksheet.builder()
                 .name(worksheet.getName())
                 .productName(worksheet.getProductName())
@@ -239,7 +239,7 @@ public class WorksheetServiceImpl implements WorksheetService {
                 XWPFDocument document = new XWPFDocument();
                 document.write(os);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new ExportException("Error while exporting", WrkshtErrors.EXPORT_ERROR);
             }
         }
 

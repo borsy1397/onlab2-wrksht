@@ -10,7 +10,6 @@ import com.captainborsy.wrksht.api.model.WorkflowStatusChangeDTO;
 import com.captainborsy.wrksht.api.model.WorksheetCreationDTO;
 import com.captainborsy.wrksht.api.model.WorksheetDetailsDTO;
 import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
-import com.captainborsy.wrksht.errorhandling.exception.EntityNotFoundException;
 import com.captainborsy.wrksht.errorhandling.exception.UnprocessableEntityException;
 import com.captainborsy.wrksht.mapper.WorkflowMapper;
 import com.captainborsy.wrksht.mapper.WorksheetMapper;

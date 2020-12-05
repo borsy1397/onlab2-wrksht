@@ -11,7 +11,7 @@
     <groupId>com.captainborsy</groupId>
     <artifactId>wrksht</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>wrksht</name>
     <description>WRKSHT project</description>
 

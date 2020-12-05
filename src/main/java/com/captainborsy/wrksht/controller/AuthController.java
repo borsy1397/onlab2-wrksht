@@ -14,7 +14,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -45,13 +44,7 @@ public class AuthController implements AuthApi {
 
     @Override
     public ResponseEntity<LoginResponseDTO> login(@Valid LoginRequestDTO loginRequestDTO) {
-        LoginResponseDTO lrDTO = null;
-        try {
-            lrDTO = authenticationService.login(loginRequestDTO);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok(lrDTO);
+        return ResponseEntity.ok(authenticationService.login(loginRequestDTO));
     }
 
     @Override

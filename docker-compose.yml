@@ -12,11 +12,13 @@ services:
       POSTGRES_DB: wrksht
       PGDATA: /var/lib/postgresql/data/pgdata
   backend:
-    image: borsybela/wrksht-backend:v1
+    image: borsybela/wrksht-backend:v3
     container_name: wrksht-backend
     restart: unless-stopped
+    ports:
+      - '80:8080'
     expose:
-      - '8080'
+      - '80'
     environment:
       SPRING_DATASOURCE_USERNAME: 'postgres'
       SPRING_DATASOURCE_PASSWORD: 'postgres'

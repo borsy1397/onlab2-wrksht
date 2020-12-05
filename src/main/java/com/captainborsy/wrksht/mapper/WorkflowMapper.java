@@ -1,24 +1,31 @@
 package com.captainborsy.wrksht.mapper;
 
-import com.captainborsy.wrksht.api.model.StationDetailsDTO;
 import com.captainborsy.wrksht.api.model.WorkflowCreationDTO;
 import com.captainborsy.wrksht.api.model.WorkflowDetailsDTO;
-import com.captainborsy.wrksht.model.Station;
 import com.captainborsy.wrksht.model.Workflow;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class WorkflowMapper {
 
-    private WorkflowMapper() {}
+    private WorkflowMapper() {
+    }
 
     public static WorkflowDetailsDTO mapWorkflowToWorkflowDetailsDTO(Workflow workflow) {
         return WorkflowDetailsDTO.builder()
                 .id(workflow.getId())
                 .name(workflow.getName())
-                //.createdAt(user.getCreatedAt().atOffset(ZoneOffset.UTC))
-                //.updatedAt(user.getUpdatedAt().atOffset(ZoneOffset.UTC))
+                .shiftLeadComment(workflow.getShiftLeadComment())
+                .workerId(workflow.getWorker() != null ? workflow.getWorker().getId() : null)
+                .worksheetId(workflow.getWorksheet().getId())
+                .stationId(workflow.getStation().getId())
+                .status(WorkflowDetailsDTO.StatusEnum.valueOf(workflow.getShiftLeadComment()))
+                .startedAt(workflow.getStartedAt().atOffset(ZoneOffset.UTC))
+                .stoppedAt(workflow.getStoppedAt().atOffset(ZoneOffset.UTC))
+                .createdAt(workflow.getCreatedAt().atOffset(ZoneOffset.UTC))
+                .updatedAt(workflow.getUpdatedAt().atOffset(ZoneOffset.UTC))
                 .build();
     }
 

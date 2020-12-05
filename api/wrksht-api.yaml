@@ -1024,9 +1024,6 @@ components:
           minLength: 8
         role:
           type: string
-          enum:
-            - ADMIN
-            - WORKER
       required:
         - firstName
         - lastName
@@ -1098,6 +1095,7 @@ components:
     WorkflowDetailsDTO:
       title: WorkflowDetailsDTO
       type: object
+      description: ''
       properties:
         id:
           type: string
@@ -1111,8 +1109,10 @@ components:
           type: string
         startedAt:
           type: string
+          format: date-time
         stoppedAt:
           type: string
+          format: date-time
         status:
           type: string
           enum:

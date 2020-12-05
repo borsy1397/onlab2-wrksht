@@ -2,6 +2,8 @@ package com.captainborsy.wrksht.mapper;
 
 import com.captainborsy.wrksht.api.model.UserDTO;
 import com.captainborsy.wrksht.api.model.UserRegistrationDTO;
+import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
+import com.captainborsy.wrksht.errorhandling.exception.UnprocessableEntityException;
 import com.captainborsy.wrksht.model.Role;
 import com.captainborsy.wrksht.model.User;
 
@@ -11,7 +13,8 @@ import java.util.stream.Collectors;
 
 public class UserMapper {
 
-    private UserMapper() {}
+    private UserMapper() {
+    }
 
     public static UserDTO mapUserToUserDTO(User user) {
         return UserDTO.builder()
@@ -31,12 +34,20 @@ public class UserMapper {
     }
 
     public static User mapUserRegistrationDTOToUser(UserRegistrationDTO userRegistrationDTO) {
+
+        Role role;
+        try {
+            role = Role.valueOf(userRegistrationDTO.getRole());
+        } catch (IllegalArgumentException e) {
+            throw new UnprocessableEntityException("Parsing role (" + userRegistrationDTO.getRole() + ") was failed", WrkshtErrors.PARSE_ERROR);
+        }
+
         return User.builder()
                 .firstName(userRegistrationDTO.getFirstName())
                 .lastName(userRegistrationDTO.getLastName())
                 .username(userRegistrationDTO.getUsername())
                 .password(userRegistrationDTO.getPassword())
-                .role(Role.valueOf(userRegistrationDTO.getRole().toString()))
+                .role(role)
                 .build();
     }
 }
