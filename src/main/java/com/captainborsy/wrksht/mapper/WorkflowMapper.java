@@ -17,7 +17,7 @@ public class WorkflowMapper {
         return WorkflowDetailsDTO.builder()
                 .id(workflow.getId())
                 .name(workflow.getName())
-                .orderNumber(workflow.getOrderNumber())
+                .orderNumber(workflow.getOrdering())
                 .shiftLeadComment(workflow.getShiftLeadComment())
                 .workerId(workflow.getWorker() != null ? workflow.getWorker().getId() : null)
                 .worksheetId(workflow.getWorksheet().getId())

@@ -109,21 +109,21 @@ public class WorksheetController implements WorksheetApi {
     }
 
     @Override
-    @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_SHIFT_LEAD, AuthoritiesConstants.ROLE_WORKER})
+    @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_SHIFT_LEAD})
     public ResponseEntity<Void> orderWorkflowById(String worksheetId, String workflowId, @Valid OrderWorkflowDTO orderWorkflowDTO) {
         worksheetService.orderWorkflowById(worksheetId, workflowId, orderWorkflowDTO);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_SHIFT_LEAD, AuthoritiesConstants.ROLE_WORKER})
+    @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_SHIFT_LEAD})
     public ResponseEntity<Void> updateWorkflowById(String worksheetId, String workflowId, @Valid UpdateWorkflowDTO updateWorkflowDTO) {
         worksheetService.updateWorkflowById(worksheetId, workflowId, updateWorkflowDTO);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_SHIFT_LEAD, AuthoritiesConstants.ROLE_WORKER})
+    @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_SHIFT_LEAD})
     public ResponseEntity<Void> updateWorksheetById(String worksheetId, @Valid UpdateWorksheetDTO updateWorksheetDTO) {
         worksheetService.updateWorksheetById(worksheetId, updateWorksheetDTO);
         return ResponseEntity.ok().build();

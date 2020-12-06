@@ -49,7 +49,7 @@ public class Workflow {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private User worker;
 
-    private Integer orderNumber;
+    private Integer ordering;
 
     private String shiftLeadComment;
 

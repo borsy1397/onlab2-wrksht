@@ -113,10 +113,10 @@ public class WorksheetServiceImpl implements WorksheetService {
         Workflow workflow = WorkflowMapper.mapWorkflowCreationDTOtoWorkflow(workflowCreationDTO);
 
         List<Workflow> workflows = worksheet.getWorkflows();
-        workflows.sort(Comparator.comparing(Workflow::getOrderNumber));
+        workflows.sort(Comparator.comparing(Workflow::getOrdering));
 
         workflow.setStatus(Status.TODO);
-        workflow.setOrderNumber(workflows.size() + 1);
+        workflow.setOrdering(workflows.size() + 1);
         workflow.setStation(station);
         station.getWorkflows().add(workflow);
         worksheet.getWorkflows().add(workflow);
@@ -192,21 +192,21 @@ public class WorksheetServiceImpl implements WorksheetService {
     @Transactional
     public void orderWorkflowById(String worksheetId, String workflowId, OrderWorkflowDTO orderWorkflowDTO) {
         List<Workflow> workflows = workflowRepository.findByWorksheetId(worksheetId);
-        workflows.sort(Comparator.comparing(Workflow::getOrderNumber));
+        workflows.sort(Comparator.comparing(Workflow::getOrdering));
 
         for (int i = 0; i < workflows.size(); i++) {
             Workflow actual = workflows.get(i);
-            int actualOrder = actual.getOrderNumber();
+            int actualOrder = actual.getOrdering();
             if (actual.getId().equals(workflowId)) {
                 if (orderWorkflowDTO.getDirection() == OrderWorkflowDTO.DirectionEnum.DOWN) {
                     if (actualOrder != 1) {
-                        actual.setOrderNumber(actualOrder - 1);
-                        workflows.get(i - 1).setOrderNumber(actualOrder);
+                        actual.setOrdering(actualOrder - 1);
+                        workflows.get(i - 1).setOrdering(actualOrder);
                     }
                 } else {
                     if (actualOrder != workflows.size()) {
-                        actual.setOrderNumber(actualOrder + 1);
-                        workflows.get(i + 1).setOrderNumber(actualOrder);
+                        actual.setOrdering(actualOrder + 1);
+                        workflows.get(i + 1).setOrdering(actualOrder);
                     }
                 }
                 break;
@@ -243,7 +243,7 @@ public class WorksheetServiceImpl implements WorksheetService {
             }
         }
 
-        workflows.sort(Comparator.comparing(Workflow::getOrderNumber));
+        workflows.sort(Comparator.comparing(Workflow::getOrdering));
 
         DocxTableRowWorkflow firstRow = new DocxTableRowWorkflow("Név", "Megjegyzés", "Állapot", "Kezdés ideje");
         List<DocxTableRowWorkflow> docxTableRowWorkflows = workflows.stream().map(this::mapToDocxTableRowWorkflow).collect(Collectors.toList());
