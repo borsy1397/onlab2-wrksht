@@ -1128,6 +1128,8 @@ components:
           format: date-time
         worksheetId:
           type: string
+        orderNumber:
+          type: integer
     UpdateWorksheetDTO:
       title: UpdateWorksheetDTO
       type: object
