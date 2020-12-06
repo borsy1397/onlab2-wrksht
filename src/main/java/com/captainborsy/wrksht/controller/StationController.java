@@ -3,7 +3,9 @@ package com.captainborsy.wrksht.controller;
 import com.captainborsy.wrksht.api.StationApi;
 import com.captainborsy.wrksht.api.model.StationCreationDTO;
 import com.captainborsy.wrksht.api.model.StationDetailsDTO;
+import com.captainborsy.wrksht.api.model.WorkflowDetailsDTO;
 import com.captainborsy.wrksht.mapper.StationMapper;
+import com.captainborsy.wrksht.mapper.WorkflowMapper;
 import com.captainborsy.wrksht.security.AuthoritiesConstants;
 import com.captainborsy.wrksht.service.StationService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,11 @@ public class StationController implements StationApi {
     @Secured({AuthoritiesConstants.ROLE_ADMIN, AuthoritiesConstants.ROLE_SHIFT_LEAD, AuthoritiesConstants.ROLE_WORKER})
     public ResponseEntity<List<StationDetailsDTO>> getAllStations() {
         return ResponseEntity.ok(StationMapper.mapStationListToStationDetailsDTOList(stationService.getAllStation()));
+    }
+
+    @Override
+    public ResponseEntity<List<WorkflowDetailsDTO>> getWorkflowsOfStetion(String stationId) {
+        return ResponseEntity.ok(WorkflowMapper.mapWorkflowListToWorkflowDetailsDTOList(stationService.getWorkflowsByStationId(stationId)));
     }
 
     @Override

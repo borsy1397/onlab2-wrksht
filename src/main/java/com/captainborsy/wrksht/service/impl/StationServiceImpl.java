@@ -5,7 +5,9 @@ import com.captainborsy.wrksht.errorhandling.domain.WrkshtErrors;
 import com.captainborsy.wrksht.errorhandling.exception.ConflictException;
 import com.captainborsy.wrksht.errorhandling.exception.EntityNotFoundException;
 import com.captainborsy.wrksht.model.Station;
+import com.captainborsy.wrksht.model.Workflow;
 import com.captainborsy.wrksht.repository.StationRepository;
+import com.captainborsy.wrksht.repository.WorkflowRepository;
 import com.captainborsy.wrksht.service.StationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import java.util.List;
 public class StationServiceImpl implements StationService {
 
     private final StationRepository stationRepository;
+    private final WorkflowRepository workflowRepository;
 
     @Override
     @Transactional
@@ -65,6 +68,11 @@ public class StationServiceImpl implements StationService {
     public void forceLogoutStation(String stationId) {
         Station station = getStationById(stationId);
         station.setSet(false);
+    }
+
+    @Override
+    public List<Workflow> getWorkflowsByStationId(String stationId) {
+        return workflowRepository.findByStationId(stationId);
     }
 
     @Override

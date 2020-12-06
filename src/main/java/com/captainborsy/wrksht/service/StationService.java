@@ -2,6 +2,7 @@ package com.captainborsy.wrksht.service;
 
 import com.captainborsy.wrksht.api.model.StationCreationDTO;
 import com.captainborsy.wrksht.model.Station;
+import com.captainborsy.wrksht.model.Workflow;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface StationService {
     void forceLogoutStation(String stationId);
 
     void updateStationById(String stationId, StationCreationDTO stationCreationDTO);
+
+    List<Workflow> getWorkflowsByStationId(String stationId);
 }

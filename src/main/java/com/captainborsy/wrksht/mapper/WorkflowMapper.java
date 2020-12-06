@@ -21,9 +21,9 @@ public class WorkflowMapper {
                 .workerId(workflow.getWorker() != null ? workflow.getWorker().getId() : null)
                 .worksheetId(workflow.getWorksheet().getId())
                 .stationId(workflow.getStation().getId())
-                .status(WorkflowDetailsDTO.StatusEnum.valueOf(workflow.getShiftLeadComment()))
-                .startedAt(workflow.getStartedAt().atOffset(ZoneOffset.UTC))
-                .stoppedAt(workflow.getStoppedAt().atOffset(ZoneOffset.UTC))
+                .status(WorkflowDetailsDTO.StatusEnum.valueOf(workflow.getStatus().toString()))
+                .startedAt(workflow.getStartedAt() != null ? workflow.getStartedAt().atOffset(ZoneOffset.UTC) : null)
+                .stoppedAt(workflow.getStoppedAt() != null ? workflow.getStoppedAt().atOffset(ZoneOffset.UTC) : null)
                 .createdAt(workflow.getCreatedAt().atOffset(ZoneOffset.UTC))
                 .updatedAt(workflow.getUpdatedAt().atOffset(ZoneOffset.UTC))
                 .build();

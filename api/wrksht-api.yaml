@@ -884,7 +884,8 @@ paths:
         required: true
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - station
       responses:
         '200':
           description: OK

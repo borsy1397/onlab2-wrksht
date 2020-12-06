@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface WorkflowRepository extends JpaRepository<Workflow, String> {
 
+    List<Workflow> findByStationId(String stationId);
+
     List<Workflow> findByWorksheetId(String worksheetId);
 
     List<Workflow> findByWorksheetIdAndStatus(String worksheetId, Status status);
